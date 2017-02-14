@@ -29,9 +29,15 @@ class Handler(webapp2.RequestHandler):
 
 class MainPage(Handler):
 
+    def get(self):
+        self.redirect('/blog')
+
+
+class BlogHome(Handler):
+
     def render_base(self, title="", content="", error=""):
         entries=db.GqlQuery("SELECT * from Entry ORDER BY created DESC LIMIT 5")
-        self.render("base.html", title=title, content=content, error=error, entries=entries)
+        self.render("blog.html", title=title, content=content, error=error, entries=entries)
 
     def get(self):
         self.render_base()
@@ -51,29 +57,33 @@ class MainPage(Handler):
 
 class NewPost(Handler):
 
-
     def get(self, title="", content="", error=""):
         self.render("newpost.html")
-
 
     def post(self):
         title = self.request.get("title")
         content = self.request.get("content")
 
-
         if title and content:
             a=Entry(title=title, content=content)
             a.put()
-            self.redirect("/")
+            self.redirect("/blog/"+str(a.key().id()))
         else:
             error="Need both title and content"
             self.render("newpost.html",title=title, content=content, error=error)
 
 
-
+class ViewPostHandler(Handler):
+    def get(self,id):
+        entry=Entry.get_by_id(int(id), parent=None)
+        self.render("individual_post.html",title=entry.title,content=entry.content)
 
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/newpost', NewPost)
+    ('/newpost', NewPost),
+    ('/blog',BlogHome),
+    webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
+
 ], debug=True)
+

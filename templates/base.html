@@ -6,7 +6,6 @@
             .error {
                 color: red;
             }
-
             body{
                 font-family: sans-serif;
                 width:800px;
@@ -59,12 +58,6 @@
 
         <hr>
 
-        {% for entry in entries %}
-        <div class="entry">
-        <div class="entry-title">{{entry.title}}</div>
-        <pre class="entry-body">{{entry.content}}</pre>
-        </div>
-        {% endfor %}
         {% block content %}
         {% endblock %}
 
